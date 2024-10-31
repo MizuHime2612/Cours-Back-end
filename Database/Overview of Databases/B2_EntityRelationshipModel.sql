@@ -1,25 +1,25 @@
-CREATE DATABASE Bai2;
-USE Bai2;
+create database Bai2;
+use Bai2;
 
-CREATE TABLE Author (
-    AuthorID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(255) NOT NULL,
-    Bio TEXT
+create table Author (
+    id int primary key auto_increment,
+    nameAuthor varchar(255) not null,
+    Bio text
 );
 
-CREATE TABLE Publisher (
-    PublisherID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(255) NOT NULL,
-    Address VARCHAR(255)
+create table Publisher (
+    id int primary key auto_increment,
+    namePublisher varchar(255) not null,
+    address varchar(255)
 );
 
-CREATE TABLE Book (
-    BookID INT PRIMARY KEY AUTO_INCREMENT,
-    Title VARCHAR(255) NOT NULL,
-    PublicationDate DATE,
-    Price DECIMAL(10, 2),
-    AuthorID INT,
-    PublisherID INT,
-    FOREIGN KEY (AuthorID) REFERENCES Author(AuthorID),
-    FOREIGN KEY (PublisherID) REFERENCES Publisher(PublisherID)
+create table Book (
+    id int primary key auto_increment,
+    title varchar(255) not null,
+    publicationDate date,
+    price decimal(10, 2),
+    authorID int,
+    publisherID int,
+    foreign key (authorID) references Author(id),
+    foreign key (publisherID) references Publisher(id)
 );
