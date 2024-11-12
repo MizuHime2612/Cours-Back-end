@@ -19,3 +19,6 @@ SELECT * FROM Students;
 UPDATE Students
 SET Age = 23
 WHERE StudentID = 2;
+
+DELETE FROM Students
+WHERE StudentID = 1;
