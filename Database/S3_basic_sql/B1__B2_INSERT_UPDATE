@@ -15,3 +15,7 @@ INSERT INTO Students (Name, Age, Major) VALUES
 ('Charlie', 21, 'Physics');
 
 SELECT * FROM Students;
+
+UPDATE Students
+SET Age = 23
+WHERE StudentID = 2;
