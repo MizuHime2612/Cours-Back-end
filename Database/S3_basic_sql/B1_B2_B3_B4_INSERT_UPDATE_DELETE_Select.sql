@@ -14,11 +14,11 @@ INSERT INTO Students (Name, Age, Major) VALUES
 ('Bob', 22, 'Mathematics'),
 ('Charlie', 21, 'Physics');
 
-SELECT * FROM Students;
-
 UPDATE Students
 SET Age = 23
 WHERE StudentID = 2;
 
 DELETE FROM Students
 WHERE StudentID = 1;
+
+SELECT * FROM Students;
