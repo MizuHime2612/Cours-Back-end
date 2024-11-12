@@ -1,0 +1,17 @@
+DROP DATABASE IF EXISTS S3_bai1;
+CREATE DATABASE S3_bai1;
+USE S3_bai1;
+
+CREATE TABLE Students (
+	StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(50),
+    Age INT,
+    Major VARCHAR(255)
+);
+
+INSERT INTO Students (Name, Age, Major) VALUES
+('Alice', 20, 'Computer Science'),
+('Bob', 22, 'Mathematics'),
+('Charlie', 21, 'Physics');
+
+SELECT * FROM Students;
