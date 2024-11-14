@@ -1,0 +1,48 @@
+DROP DATABASE IF EXISTS B6;
+CREATE DATABASE B6;
+USE B6;
+
+CREATE TABLE Customers (
+	 CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+     CustomerName VARCHAR(100),
+     ContactName VARCHAR(100),
+     Country VARCHAR(100)
+);
+
+CREATE TABLE Orders (
+	OrderID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE Products (
+	ProductID INT PRIMARY KEY AUTO_INCREMENT,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10, 2)
+);
+
+CREATE TABLE OrderDetails (
+	OrderDetailID INT PRIMARY KEY AUTO_INCREMENT,
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    UnitPrice DECIMAL(10, 2),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+CREATE VIEW OrderInfo AS
+SELECT * FROM Orders
+WHERE Country = 'Hà Nội';
+
+CREATE VIEW OrderDetailInfo AS
+SELECT * FROM OrderDetails
+WHERE ProductID = 3;
+
+CREATE INDEX `OrderDate`
+ON Orders(`OrderDate`);
+
+CREATE INDEX `Quantity`
+ON OrderDetails(`Quantity`);
