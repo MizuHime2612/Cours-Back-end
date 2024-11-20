@@ -1,0 +1,66 @@
+DROP SCHEMA IF EXISTS demo_index;
+CREATE SCHEMA demo_index;
+USE demo_index;
+
+CREATE TABLE Customers (
+	CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE Products (
+	ProductID INT PRIMARY KEY AUTO_INCREMENT,
+    ProductName VARCHAR(50),
+    Price DECIMAL(10, 2)
+);
+
+CREATE TABLE Orders (
+	OrderID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+CREATE TABLE Promotions (
+	PromotionID INT PRIMARY KEY AUTO_INCREMENT,
+    PromotionName VARCHAR(100),
+    DiscountPercentage DECIMAL(5, 2)
+);
+
+CREATE TABLE Sales (
+	SaleID INT PRIMARY KEY AUTO_INCREMENT,
+    OrderID INT,
+    SaleDate DATE,
+    SaleAmount DECIMAL(10, 2),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
+);
+
+DELIMITER $$
+CREATE PROCEDURE CalculateMonthlyRevenueAndApplyPromotion(
+    IN monthYear VARCHAR(7),
+    IN revenueThreshold DECIMAL(10, 2)
+)
+BEGIN
+    DECLARE startDate DATE;
+    DECLARE endDate DATE;
+
+    -- Xác định ngày đầu tiên và ngày cuối cùng của tháng
+    SET startDate = STR_TO_DATE(CONCAT(monthYear, '-01'), '%Y-%m-%d');
+    SET endDate = LAST_DAY(startDate);
+
+    -- Thêm khuyến mãi cho các khách hàng có tổng doanh thu vượt ngưỡng
+    INSERT INTO Promotions (PromotionName, DiscountPercentage)
+    SELECT 
+		CONCAT('Khuyến mãi dành cho khách hàng ', o.CustomerID), 10.00
+    FROM Orders o
+    JOIN 
+		Sales s ON o.OrderID = s.OrderID
+    WHERE s.SaleDate BETWEEN startDate AND endDate
+    GROUP BY o.CustomerID
+    HAVING SUM(s.SaleAmount) > revenueThreshold;
+END $$
+DELIMITER ;
+
+CALL CalculateMonthlyRevenueAndApplyPromotion('2024-07', 5000);
