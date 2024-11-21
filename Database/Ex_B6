@@ -1,0 +1,430 @@
+USE Buoi6;
+-- Ex2
+ALTER TABLE products
+ADD FOREIGN KEY (categoryId) REFERENCES categories(categoryId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE products
+ADD FOREIGN KEY (storeId) REFERENCES stores(storeId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE images
+ADD FOREIGN KEY (productId) REFERENCES products(productId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE reviews
+ADD FOREIGN KEY (userId) REFERENCES users(userId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE reviews
+ADD FOREIGN KEY (productId) REFERENCES products(productId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE carts
+ADD FOREIGN KEY (productId) REFERENCES products(productId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE carts
+ADD FOREIGN KEY (userId) REFERENCES users(userId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE order_details
+ADD FOREIGN KEY (productId) REFERENCES products(productId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE order_details
+ADD FOREIGN KEY (orderId) REFERENCES orders(orderId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE stores
+ADD FOREIGN KEY (userId) REFERENCES users(userId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE orders
+ADD FOREIGN KEY (userId) REFERENCES users(userId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE orders
+ADD FOREIGN KEY (storeId) REFERENCES stores(storeId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+-- Ex3
+-- Liệt kê tất cả các thông tin về sản phẩm (products).
+SELECT * FROM products;
+
+-- Tìm tất cả các đơn hàng (orders) có tổng giá trị (totalPrice) lớn hơn 500,000.
+SELECT * FROM orders
+WHERE totalPrice > 500000;
+
+-- Liệt kê tên và địa chỉ của tất cả các cửa hàng (stores).
+SELECT storeName, addressStore
+FROM stores;
+
+-- Tìm tất cả người dùng (users) có địa chỉ email kết thúc bằng '@gmail.com'.
+SELECT 
+	userName,
+    email
+FROM users
+WHERE email LIKE '%@gmail.com';
+
+-- Hiển thị tất cả các đánh giá (reviews) với mức đánh giá (rate) bằng 5.
+SELECT * 
+FROM reviews
+WHERE rate = 5;
+
+-- Liệt kê tất cả các sản phẩm có số lượng (quantity) dưới 10.
+SELECT 
+	productName,
+    quantity
+FROM products
+WHERE quantity < 10;
+
+-- Tìm tất cả các sản phẩm thuộc danh mục categoryId = 1.
+SELECT 
+	productName,
+    categoryId
+FROM products
+WHERE categoryId = 1;
+
+-- Đếm số lượng người dùng (users) có trong hệ thống.
+SELECT COUNT(userId) AS "số lượng người dùng"
+FROM users;
+
+-- Tính tổng giá trị của tất cả các đơn hàng (orders).
+SELECT SUM(totalPrice) AS "tổng giá trị tất cả các đơn hàng"
+FROM orders;
+
+-- Tìm sản phẩm có giá cao nhất (price).
+SELECT MAX(price) AS "sản phẩm có giá cao nhất"
+FROM products;
+
+-- Liệt kê tất cả các cửa hàng đang hoạt động (statusStore = 1).
+SELECT 
+	storeName,
+    statusstore
+FROM stores
+WHERE statusStore = 1;
+
+-- Đếm số lượng sản phẩm theo từng danh mục (categories).
+SELECT 
+	c.categoryId, 
+    c.categoryName, 
+    COUNT(p.productId) AS productCount
+FROM categories c
+LEFT JOIN 
+	products p ON c.categoryId = p.categoryId
+GROUP BY c.categoryId, c.categoryName;
+
+-- Tìm tất cả các sản phẩm mà chưa từng có đánh giá.
+SELECT p.*
+FROM products p
+LEFT JOIN 
+	reviews r ON p.productId = r.productId
+WHERE r.productId IS NULL;
+
+-- Hiển thị tổng số lượng hàng đã bán (quantityOrder) của từng sản phẩm.
+SELECT 
+	p.productId, 
+	p.productName, 
+    SUM(od.quantityOrder) AS totalQuantitySold
+FROM products p
+JOIN 
+	order_details od ON p.productId = od.productId
+GROUP BY p.productId, p.productName;
+
+-- Tìm các người dùng (users) chưa đặt bất kỳ đơn hàng nào.
+SELECT u.userName
+FROM users u
+LEFT JOIN 
+	orders o ON u.userId = o.userId
+WHERE o.orderId IS NULL;
+
+
+-- Hiển thị tên cửa hàng và tổng số đơn hàng được thực hiện tại từng cửa hàng.
+SELECT 
+	s.storeName, 
+	COUNT(o.orderId) AS totalOrders
+FROM stores s
+LEFT JOIN 
+	orders o ON s.storeId = o.storeId
+GROUP BY s.storeId, s.storeName;
+
+-- Hiển thị thông tin của sản phẩm, kèm số lượng hình ảnh liên quan.
+SELECT 
+	p.productId, 
+	p.productName, 
+    COUNT(i.imageId) AS imageCount
+FROM products p
+LEFT JOIN 
+	images i ON p.productId = i.productId
+GROUP BY p.productId, p.productName;
+
+-- Hiển thị các sản phẩm kèm số lượng đánh giá và đánh giá trung bình.
+SELECT 
+    p.productId, 
+    p.productName, 
+    COUNT(r.reviewId) AS reviewCount,
+    AVG(r.rate) AS AVGrate
+FROM products p
+LEFT JOIN reviews r ON p.productId = r.productId
+GROUP BY p.productId, p.productName;
+
+-- Tìm người dùng có số lượng đánh giá nhiều nhất.
+SELECT 
+    u.userId, 
+    u.userName, 
+    COUNT(r.reviewId) AS reviewCount
+FROM users u
+JOIN reviews r ON u.userId = r.userId
+GROUP BY u.userId, u.userName
+ORDER BY reviewCount DESC
+LIMIT 1;
+
+-- Hiển thị top 3 sản phẩm bán chạy nhất (dựa trên số lượng đã bán).
+SELECT 
+    p.productId, 
+    p.productName, 
+    SUM(od.quantityOrder) AS totalQuantitySold
+FROM products p
+JOIN 
+	order_details od ON p.productId = od.productId
+GROUP BY p.productId, p.productName
+ORDER BY totalQuantitySold DESC
+LIMIT 3;
+
+-- Tìm sản phẩm bán chạy nhất tại cửa hàng có storeId = 'S001'.
+SELECT 
+    p.productId, 
+    p.productName, 
+    SUM(od.quantityOrder) AS totalQuantitySold
+FROM products p
+JOIN order_details od ON p.productId = od.productId
+JOIN stores s ON p.storeId = s.storeId
+WHERE s.storeId = 'S001'
+GROUP BY p.productId, p.productName
+ORDER BY totalQuantitySold DESC
+LIMIT 1;
+
+-- Hiển thị danh sách tất cả các sản phẩm có giá trị tồn kho lớn hơn 1 triệu (giá * số lượng).
+SELECT 
+    p.productId, 
+    p.productName, 
+    p.price, 
+    p.quantity, 
+    (p.quantity * p.price) AS stockValue
+FROM products p
+WHERE (p.quantity * p.price) > 1000000;
+
+-- Tìm cửa hàng có tổng doanh thu cao nhất.
+SELECT 
+    s.storeId, 
+    s.storeName, 
+    SUM(od.quantityOrder * p.price) AS totalRevenue
+FROM stores s
+JOIN 
+	products p ON s.storeId = p.storeId
+JOIN 
+	order_details od ON p.productId = od.productId
+GROUP BY s.storeId, s.storeName
+ORDER BY totalRevenue DESC
+LIMIT 1;
+
+-- Hiển thị danh sách người dùng và tổng số tiền họ đã chi tiêu.
+SELECT 
+    u.userId, 
+    u.userName, 
+    SUM(od.quantityOrder * p.price) AS totalSpent
+FROM users u
+JOIN 
+	orders o ON u.userId = o.userId
+JOIN 
+	order_details od ON o.orderId = od.orderId
+JOIN 
+	products p ON od.productId = p.productId
+GROUP BY u.userId, u.userName;
+
+-- Tìm đơn hàng có tổng giá trị cao nhất và liệt kê thông tin chi tiết.
+SELECT 
+    o.*, 
+    SUM(od.quantityOrder * p.price) AS totalOrderValue
+FROM orders o
+JOIN 
+	order_details od ON o.orderId = od.orderId
+JOIN 
+	products p ON od.productId = p.productId
+GROUP BY o.orderId, o.userId, o.storeId
+ORDER BY totalOrderValue DESC
+LIMIT 1;
+
+-- Tính số lượng sản phẩm trung bình được bán ra trong mỗi đơn hàng.
+SELECT 
+    AVG(quantityOrder) AS AvgQuantityOrder
+FROM order_details;
+
+-- Hiển thị tên sản phẩm và số lần sản phẩm đó được thêm vào giỏ hàng.
+SELECT 
+	p.productName,
+    COUNT(c.quantityCart) AS TotalQuantityCart
+FROM products p
+JOIN
+	carts c ON p.productId = c.productId
+GROUP BY c.productId;
+
+-- Tìm tất cả các sản phẩm đã bán nhưng không còn tồn kho trong kho hàng.
+SELECT 
+    p.productId, 
+    p.productName, 
+    p.quantity
+FROM products p
+JOIN 
+	order_details od ON p.productId = od.productId
+WHERE p.quantity = 0
+GROUP BY p.productId;
+
+-- Tìm các đơn hàng được thực hiện bởi người dùng có email là duong@gmail.com'.
+SELECT o.*
+FROM orders o
+JOIN users u ON o.userId = u.userId
+WHERE u.email = 'duong@gmail.com';
+
+-- Hiển thị danh sách các cửa hàng kèm theo tổng số lượng sản phẩm mà họ sở hữu.
+SELECT 
+    s.storeId, 
+    s.storeName, 
+    SUM(p.quantity) AS totalProducts
+FROM stores s
+JOIN 
+	products p ON s.storeId = p.storeId
+GROUP BY s.storeId;
+
+-- EX 4
+-- Tạo view (Bảng ảo) để hiển thị dữ liệu theo các yêu cầu sau
+-- View hiển thị tên sản phẩm (productName) và giá (price) từ bảng products với giá trị giá (price) lớn hơn 500,000 có tên là expensive_products
+CREATE VIEW expensive_products AS
+SELECT 
+	productName,
+    price
+FROM products
+WHERE price > 500000;
+
+-- Truy vấn dữ liệu từ view vừa tạo expensive_products
+SELECT * FROM expensive_products;
+-- Làm thế nào để cập nhật giá trị của view? Ví dụ, cập nhật giá (price) thành 600,000 cho sản phẩm có tên Product A trong view expensive_products.
+UPDATE expensive_products
+SET price = 600000
+WHERE productName = "Product A";
+
+-- Làm thế nào để xóa view expensive_products?
+DROP VIEW expensive_products;
+
+--  Tạo một view hiển thị tên sản phẩm (productName), tên danh mục (categoryName) bằng cách kết hợp bảng products và categories.
+CREATE VIEW product_category_view AS
+SELECT 
+    p.productName, 
+    c.categoryName
+FROM products p
+JOIN categories c ON p.categoryId = c.categoryId;
+
+-- Ex5
+-- Làm thế nào để tạo một index trên cột productName của bảng products?
+CREATE INDEX idx_product_name ON products (productName);
+
+-- Hiển thị danh sách các index trong cơ sở dữ liệu?
+SELECT 
+    TABLE_NAME AS table_name,
+    INDEX_NAME AS index_name
+FROM information_schema.STATISTICS
+WHERE TABLE_SCHEMA = 'buoi6'
+GROUP BY TABLE_NAME, INDEX_NAME;
+
+-- Trình bày cách xóa index idx_productName đã tạo trước đó?
+DROP INDEX idx_product_name ON products;
+
+-- Tạo một procedure tên getProductByPrice để lấy danh sách sản phẩm với giá lớn hơn một giá trị đầu vào (priceInput)?
+DELIMITER $$
+CREATE PROCEDURE getProductByPrice(IN priceInput DECIMAL(10, 2))
+BEGIN
+    SELECT productId, productName, price
+    FROM products
+    WHERE price > priceInput;
+END $$
+DELIMITER ;
+	
+-- Làm thế nào để gọi procedure getProductByPrice với đầu vào là 500000?
+CAll getProductByPrice(500000);
+
+-- Tạo một procedure getOrderDetails trả về thông tin chi tiết đơn hàng với đầu vào là orderId?
+DELIMITER $$
+CREATE PROCEDURE getOrderDetails(IN orderIdInput VARCHAR(100))
+BEGIN
+    SELECT 
+        o.orderId,
+        o.orderDate,
+        o.customerId,
+        od.productId,
+        od.quantity,
+        od.price
+    FROM orders o
+    JOIN order_details od ON o.orderId = od.orderId
+    WHERE o.orderId = orderIdInput;
+END $$
+DELIMITER ;
+
+-- Làm thế nào để xóa procedure getOrderDetails?
+DROP PROCEDURE getOrderDetails;
+
+-- Tạo một procedure tên addNewProduct để thêm mới một sản phẩm vào bảng products. Các tham số gồm productName, price, description, và quantity.
+DELIMITER $$
+CREATE PROCEDURE addNewProduct (IN productNamei VARCHAR(100),In pricei DECIMAL(10,2),IN descriptioni VARCHAR(200),IN quantityi INT )
+BEGIN
+	INSERT INTO products (productName, price, description, quantity)
+    VALUES (productNamei,pricei,descriptioni,quantityi);
+END $$
+DELIMITER ;
+
+-- Tạo một procedure tên deleteProductById để xóa sản phẩm khỏi bảng products dựa trên tham số productId.
+DELIMITER $$
+CREATE PROCEDURE deleteProductById(IN productIdi VARCHAR(100))
+BEGIN
+	DELETE FROM products
+    WHERE productId=productIdi;
+END $$
+DELIMITER ;
+
+-- Tạo một procedure tên searchProductByName để tìm kiếm sản phẩm theo tên (tìm kiếm gần đúng) từ bảng products.
+DELIMITER $$
+CREATE PROCEDURE searchProductByName(IN namei VARCHAR(50))
+BEGIN
+	SELECT * From products
+    WHERE productName like namei;
+END $$
+DELIMITER ;
+
+-- Tạo một procedure tên filterProductsByPriceRange để lấy danh sách sản phẩm có giá trong khoảng từ minPrice đến maxPrice.
+DELIMITER $$
+CREATE PROCEDURE filterProductsByPriceRange(IN minPrice DECIMAL(10,2),IN maxPrice DECIMAL(10,2))
+BEGIN
+	SELECT * From products
+    WHERE price BETWEEN minPrice and maxPrice;
+END $$
+DELIMITER ;
+
+-- Tạo một procedure tên paginateProducts để phân trang danh sách sản phẩm, với hai tham số pageNumber và pageSize.
+DELIMITER $$
+CREATE PROCEDURE paginateProducts(IN pageNumber int , IN pageSize INT )
+BEGIN
+	
+END $$
+DELIMITER ;
