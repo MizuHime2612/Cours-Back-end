@@ -1,0 +1,15 @@
+"use strict";
+console.log("Hi");
+let fullname;
+fullname = "trang";
+console.log(fullname);
+let age;
+age = 20;
+let gender;
+gender = true;
+let empty;
+empty = null;
+let randomValue;
+randomValue = 18;
+randomValue = "Hi";
+randomValue = true;

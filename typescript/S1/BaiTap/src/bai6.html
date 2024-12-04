@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Máy tính đơn giản</h1>
+        <input type="text" id="num1" placeholder="Nhập số thứ nhất">
+        <input type="text" id="num2" placeholder="Nhập số thứ hai">
+        
+        <div class="buttons">
+            <button onclick="calculate('sum')">Tổng</button>
+            <button onclick="calculate('subtract')">Hiệu</button>
+            <button onclick="calculate('multiply')">Tích</button>
+            <button onclick="calculate('divide')">Thương</button>
+            <button onclick="calculate('power')">Luỹ thừa</button>
+            <button onclick="calculate('factorial1')">Giai thừa 1</button>
+            <button onclick="calculate('factorial2')">Giai thừa 2</button>
+            <button onclick="calculate('nthRoot')">Căn bậc num2 của num1</button>
+        </div>
+        
+        <p id="result">Kết quả: </p>
+    </div>
+    <script src="../dist/B6_index.js"></script> 
+</body>
+</html>
